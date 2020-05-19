@@ -1,6 +1,6 @@
 
 from commands_mapper import commands
-from cmd_func import pwd
+from cmd_func import pwd,command_error
 import os
 
 
@@ -21,28 +21,29 @@ if __name__ == '__main__':
             cmd , agrs = user_cmd.split(' ')
             cmd_func = commands[cmd]
             result = cmd_func(agrs)
-            if result.err:
-                print(err)
+            if result['err']:
+                print(result['err'])
                 continue
-            for line in result.content:
-                print(line)
+            if  result['content']:
+                for line in result['content']:
+                    print(line)
 
             continue
         
         except KeyError:
-            SRED = '\033[31m'    # Warning color
-            CEND = '\033[0m'
-            print('%s this command is not recognized %s' % (SRED,CEND))
+            command_error()
+
 
         except ValueError:
             try:
                 cmd_func = commands[user_cmd]
-                results = cmd_func()
-                for n,line in enumerate(results):
-                    print('     '+str(n) + '->  '+ line)
+                result = cmd_func()
+                if result['err']:
+                    print(result['err'])
+                    continue
+                if result['content']:
+                    for line in  result['content']:
+                        print(line)
             except KeyError:
-                SRED = '\033[31m'    # Warning color
-                CEND = '\033[0m'
-                print('%s this command is not recognized %s' % (SRED,CEND))
-            
-                continue
+               command_error()
+               continue
