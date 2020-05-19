@@ -1,6 +1,8 @@
 
-from commands_dict import commands
+from commands_mapper import commands
 from cmd_func import pwd
+import os
+
 
 
 print("\n\n\n\n\n  ***** MR. Terminal *****   ")
@@ -19,12 +21,28 @@ if __name__ == '__main__':
             cmd , agrs = user_cmd.split(' ')
             cmd_func = commands[cmd]
             result = cmd_func(agrs)
-            if not result:
-                print('   Directory not found')
+            if result.err:
+                print(err)
+                continue
+            for line in result.content:
+                print(line)
 
             continue
+        
+        except KeyError:
+            SRED = '\033[31m'    # Warning color
+            CEND = '\033[0m'
+            print('%s this command is not recognized %s' % (SRED,CEND))
+
         except ValueError:
-            cmd_func = commands[user_cmd]
-            results = cmd_func()
-            for n,line in enumerate(results):
-                print('     '+str(n) + '->  '+ line)
+            try:
+                cmd_func = commands[user_cmd]
+                results = cmd_func()
+                for n,line in enumerate(results):
+                    print('     '+str(n) + '->  '+ line)
+            except KeyError:
+                SRED = '\033[31m'    # Warning color
+                CEND = '\033[0m'
+                print('%s this command is not recognized %s' % (SRED,CEND))
+            
+                continue
