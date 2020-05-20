@@ -2,6 +2,7 @@
 from commands_mapper import commands
 from cmd_func import pwd,command_error
 import os
+import gc
 
 
 
@@ -12,6 +13,7 @@ print('\n\n')
 
 if __name__ == '__main__':
     while True:
+        gc.collect()
         pwd_dir = pwd()
         print()
         user_cmd  =  input(pwd_dir+' ~$ ')
@@ -21,11 +23,11 @@ if __name__ == '__main__':
             cmd , agrs = user_cmd.split(' ')
             cmd_func = commands[cmd]
             result = cmd_func(agrs)
-            if result['err']:
-                print(result['err'])
+            if result.err:
+                print(result.err)
                 continue
-            if  result['content']:
-                for line in result['content']:
+            if  result.content:
+                for line in result.content:
                     print(line)
 
             continue
@@ -38,11 +40,11 @@ if __name__ == '__main__':
             try:
                 cmd_func = commands[user_cmd]
                 result = cmd_func()
-                if result['err']:
-                    print(result['err'])
+                if result.err:
+                    print(result.err)
                     continue
-                if result['content']:
-                    for line in  result['content']:
+                if result.content:
+                    for line in  result.content:
                         print(line)
             except KeyError:
                command_error()

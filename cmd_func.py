@@ -1,6 +1,7 @@
 import os
 import platform
-from help_func import convert_date
+from cmd_classes import Response
+from helper_func import convert_date
 
 
 """ making func which return cmd level result    """ 
@@ -8,43 +9,36 @@ from help_func import convert_date
 
 
 
-def command_error():
-    SRED = '\033[31m'    # Warning color
+def command_error():    # show error
+    SRED = '\033[31m'    
     CEND = '\033[0m'
-    print('%s this command is not recognized %s' % (SRED,CEND))
+    print('Error: %s this command is not recognized %s' % (SRED,CEND))
 
 
 def list_content(flag=None):          # return all content in current working dir
-    info = {}             # hold func related data     
-    content = []           # func content
+    res = Response()            
     if flag == '-l':
         dir_content = os.scandir()
         for entry in dir_content:
-            if entry.is_file():
-                line_info = entry.stat()
-                line = f'\t\t{entry.name}\t\t Last Modified: {convert_date(line_info.st_mtime)}'
-                content.append(line)
-        info['content'] = content
-        info['err'] = False
-        return info
+            line_info = entry.stat()
+            line = f'\t{entry.name}\t\t\t Last Modified: {convert_date(line_info.st_mtime)}'
+            res.content.append(line)
+        return res
     else:
         content = os.listdir()
-        info['err'] = False
-        info['content'] = content
-        return info
+        res.content = content
+        return res
 
 
 def change_dir(path):
-    info = {}              # change dir 
+    res = Response()              # change dir 
     try:
         change = os.chdir(path)
     except FileNotFoundError:
-        err = ' file not found '
-        info['err'] = err
-        return info
-    info['err'] = False
-    info['content'] = False
-    return info
+        res.err = 'Error: dir not exists '
+        return res
+
+    return res
 
 
 def pwd():                    # return present working dir path
@@ -53,11 +47,53 @@ def pwd():                    # return present working dir path
 
 
 def make_dir(dir_name):         # create new dir
-    info = {}
+    res = Response()
     try:
         os.mkdir(dir_name)
     except FileExistsError:
-        err = '%s directory already exists' % dir_name
-        info['err'] = err
+        res.err = 'Error: %s directory already exists' % dir_name
+        return res
     
 
+
+def read_file(file_name=None):           # read file content
+    res = Response()
+    if file_name is None:
+        files = list(filter(os.path.isfile, os.listdir()))
+        res.content.extend(files)
+        return res
+    try:
+        file = open(file_name)
+        file_content = file.read()
+        res.content.append(file_content)
+        return res
+    except FileNotFoundError:
+        res.err = "Error: file not found "
+        return res
+
+
+def remove_file(file_name):              # remone file
+    res = Response()
+    try: 
+        os.remove(file_name)
+        content = f' {file_name} file successfully remove'
+        res.err = None
+        res.content.append(content)
+        return res
+
+    except OSError:
+        res.err = f'Error: {file_name} not a valid filename'
+        return res
+
+
+def remone_dir(dir_name):             # remove dir
+    res = Response()
+    try:
+        os.rmdir(dir_name)
+        content = f'{dir_name} directory successfully deleted '
+        res.content.append(content)
+        return res
+    except OSError:
+        res.err = f'Error: {dir_name} directory is not empty '
+        return res
+        
