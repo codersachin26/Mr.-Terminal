@@ -13,16 +13,21 @@ print('\n\n')
 
 if __name__ == '__main__':
     while True:
-        gc.collect()
         pwd_dir = pwd()
         print()
         user_cmd  =  input(pwd_dir+' ~$ ')
         if user_cmd == 'exit':
             break
         try:
-            cmd , agrs = user_cmd.split(' ')
-            cmd_func = commands[cmd]
-            result = cmd_func(agrs)
+            cmd = user_cmd.split(' ')
+            cmd_func = commands[cmd[0]]
+            cmd_args= [None,None,None]
+            cmd.remove(cmd[0])
+            for i ,arg in enumerate(cmd):
+                cmd_args[i] = arg
+
+
+            result = cmd_func(cmd_args)
             if result.err:
                 print(result.err)
                 continue
@@ -35,17 +40,3 @@ if __name__ == '__main__':
         except KeyError:
             command_error()
 
-
-        except ValueError:
-            try:
-                cmd_func = commands[user_cmd]
-                result = cmd_func()
-                if result.err:
-                    print(result.err)
-                    continue
-                if result.content:
-                    for line in  result.content:
-                        print(line)
-            except KeyError:
-               command_error()
-               continue

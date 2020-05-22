@@ -3,5 +3,8 @@
 
 
 class Response():
-    err = None
-    content = []
+    def __init__(self):
+        self.err = None
+        self.content = []
+
+
