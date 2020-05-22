@@ -122,7 +122,6 @@ def copy_file(arg):
         file_name = os.path.basename(src)
         dst = os.path.join(dst,file_name)
         shutil.copyfile(src,dst)
-
     except shutil.SameFileError:
         res.err = 'Source and destination represents the same file.'
     return res
